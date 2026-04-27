@@ -58,6 +58,16 @@ CREATE: entity=emp-002, amount=55000, effective_from=2025-09-01
 - **Tradeoff:** More rows over time (two rules instead of one edited rule). This is negligible for the data volumes we'll have.
 - **Tradeoff:** "Current state" requires filtering for `effective_until IS NULL` instead of just reading the row. Minor query complexity.
 
+## At Most One Open Rule per (entity, cost_type)
+
+A direct corollary: for any `(entity_type, entity_id, cost_type)` there is at most one Rule with `effective_until = NULL` at any time. Enforced at the database or application layer.
+
+Without this constraint, an operator who creates a "raise" without first closing the old salary rule would silently double-prorate that driver's pay. The system rejects the second open rule with a clear error pointing to the existing one.
+
+## Append-Only for CostEvents
+
+The same philosophy applies to [[Cost Event]] — corrections are reversing events, not mutations. See [[ADR-017 — Append-Only CostEvents]] for the mechanics.
+
 ## Applies To
 
-All modules that feed into the cost ledger: [[Employee Management — Overview]], [[Vehicle Maintenance — Overview]], any future cost source.
+All modules that feed into the cost ledger: [[Driver Management — Overview]], [[Vehicle Maintenance — Overview]], and any future cost source.

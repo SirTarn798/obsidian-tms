@@ -37,9 +37,10 @@ This handles all edge cases naturally:
 
 Each [[Cost Rule]] has a `proration_strategy` field:
 
-- `daily_prorate` — as described above (default for salaries, maintenance)
-- `full_period` — charge full monthly amount if any day overlaps (used for insurance, subscriptions)
-- `none` — for daily-frequency rules where proration doesn't apply
+- `daily_prorate` — as described above. Default for all monthly rules (salaries, depreciation, insurance, maintenance contracts, office rent).
+- `none` — for `daily`-frequency rules where proration doesn't apply (the rule's `amount` is already the daily rate).
+
+The previously documented `full_period` strategy ("charge full monthly amount if any day overlaps") has been **dropped**. Daily-prorate handles every realistic case correctly without edge-case ambiguity for partial-month rules. If a genuinely indivisible monthly fee appears in the future, it can be modeled as a `one_off` [[Cost Event]] on the relevant date instead of a Rule.
 
 ## Consequences
 

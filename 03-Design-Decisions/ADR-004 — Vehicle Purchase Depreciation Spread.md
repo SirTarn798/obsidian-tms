@@ -42,7 +42,7 @@ After the expected life date, the depreciation rule naturally expires. The vehic
 - Also shows depreciation as a separate line item
 - Finance team chooses which view to use for which report
 
-**Delivery cost allocation ([[Integration — Cost Ledger × Delivery Costing]]):**
+**Per-Work-Order cost allocation ([[Integration — Order × Cost Ledger]]):**
 
 - Uses the depreciation rule (547.70/day) for fixed cost allocation
 - Never uses the purchase event directly
@@ -59,7 +59,32 @@ For now, we use straight-line depreciation with zero residual value. Future enha
 
 - Allow residual value: `daily_depreciation = (purchase_price - residual_value) / expected_life_days`
 - Support declining balance method via a different rule type
-- Handle early disposal: close the depreciation rule early, create a disposal event for gain/loss
+
+## Disposal
+
+Per [[ADR-018 — Negative Amounts and Disposal]]:
+
+```
+Vehicle V1 sold for 200,000 with 400,000 remaining book value:
+
+1. Close depreciation rule:
+     UPDATE CostRule SET effective_until = sale_date
+     WHERE entity_id = V1 AND cost_type = depreciation
+
+2. Record sale proceeds (negative cost = money in):
+     INSERT CostEvent(entity_id=V1, cost_type=disposal_sale,
+                      amount=-200000, classification=one_off,
+                      occurred_on=sale_date)
+
+3. (Optional) Record write-off for explicit accounting:
+     INSERT CostEvent(entity_id=V1, cost_type=write_off,
+                      amount=400000, classification=one_off,
+                      occurred_on=sale_date)
+```
+
+The unrecovered book value (400,000) is recorded only if the operator wants explicit P&L visibility on the disposal loss. Without it, depreciation simply stops and the loss is implicit in the absence of further depreciation accruals.
+
+Insurance payouts on a vehicle (claim received) follow the same pattern: `CostEvent` with negative `amount`, `classification=one_off`.
 
 ## User Input Required
 

@@ -18,14 +18,16 @@ The system serves two audiences with conflicting needs:
 
 **These are two separate views of the same underlying data. Never merge them.**
 
-### Finance View (Layer 1 — Ledger)
+The Cost Ledger is **managerial / operational**. It is not the bookkeeping system of record — it is accrual-basis (daily salary share starts from `effective_from` regardless of cash payroll cycle), it smooths variable costs, and it allocates to operational units (Work Orders, fleet utilization). The accountant's books are a separate system that reconciles to the bank statement; the Cost Ledger feeds them via export, not the other way around.
 
-- Monthly report sums actual [[Cost Rule]] costs and [[Cost Event]] amounts for the period
-- No smoothing, no allocation
-- Matches bank account / invoices
-- Used for: P&L, budgeting, tax, management accounting
+### Managerial Finance View (Layer 1 — Ledger)
 
-### Operations View (Layer 3 — Delivery Costing)
+- Monthly report sums [[Cost Rule]] accruals and [[Cost Event]] amounts for the period
+- No smoothing, no per-WO allocation — just totals
+- Matches the company's operational P&L view (not the accountant's cash-basis books)
+- Used for: budgeting, management reporting, period-over-period comparison
+
+### Operations View (Layer 3 — Per-Work-Order Cost)
 
 - Fixed costs: daily depreciation + insurance + other rules, allocated per delivery proportional to time/distance
 - Variable costs: [[Cost Per Km]] rate × delivery distance

@@ -11,22 +11,41 @@ This vault contains architecture decisions, domain concepts, and module designs 
 |`02-Domain-Concepts`|Shared domain terms and definitions used across modules|
 |`03-Design-Decisions`|ADRs (Architecture Decision Records) — the _why_ behind choices|
 |`04-Data-Models`|Entity definitions, schemas, relationships|
-|`05-Module-Integration`|How modules connect to each other|
+|`05-Module-Integrations`|How modules connect to each other|
+
+## Start Here
+
+- **[[Model — Order to Work Order Chain]]** — the central data model. The spine that solves the VRP traceability problem.
 
 ## Modules
 
 - [[Cost Ledger — Overview]]
-- [[Order Management — Overview]] _(placeholder)_
+- [[Order Management — Overview]]
+- [[Work Order — Overview]]
+- [[Driver Management — Overview]]
 - [[VRP — Overview]] _(placeholder)_
 - [[Vehicle Maintenance — Overview]] _(placeholder)_
-- [[Employee Management — Overview]] _(placeholder)_
-- [[Work Order Income — Overview]] _(placeholder)_
+
+## Core Concepts
+
+- [[Customer]]
+- [[Service]] · [[Service Stop]] · [[Customer Location]]
+- [[Quotation]] · [[Quotation Service]] · [[Price Rule]] · [[Allocation Rule]]
+- [[Order]] · [[Order Line]] · [[Order Location]]
+- [[Work Order]] · [[Work Order Stop]] · [[Work Order Vehicle]] · [[Work Order Driver]] · [[Route]]
+- [[Vehicle]] · [[Vehicle Type]]
+- [[Subcontractor]] · [[Subcontractor Rate]]
+- [[Driver]] · [[Driver Salary]] · [[Driver Rate]]
+- [[Cost Rule]] · [[Cost Event]] · [[Cost Per Km]] · [[Monthly Operational Cost]]
 
 ## Key Integration Points
 
-- [[Integration — Cost Ledger × Delivery Costing]]
+- [[Integration — Quotation × Order]]
+- [[Integration — Order × Work Order]]
+- [[Integration — Order × Cost Ledger]]
 - [[Integration — Vehicle Maintenance × Cost Ledger]]
-- [[Integration — Employee Management × Cost Ledger]]
+- [[Integration — Driver × Cost Ledger]]
+- [[Integration — User × Cost Ledger]]
 
 ## Tags Convention
 

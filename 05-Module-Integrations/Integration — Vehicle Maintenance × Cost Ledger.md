@@ -12,23 +12,28 @@ The [[Vehicle Maintenance — Overview]] module is a **producer** of cost data. 
 
 When a vehicle has a scheduled maintenance contract (e.g., 5,000/month for regular servicing):
 
-- Creates a [[Cost Rule]] with `cost_type = "maintenance_contract"`, `frequency = monthly`
+- Creates a [[Cost Rule]] with `cost_type=maintenance_contract`, `cost_classification=fixed_time`, `frequency=monthly`, `proration_strategy=daily_prorate`
 - If the contract is renegotiated: close old rule, create new one ([[ADR-001 — Close and Replace, Never Mutate]])
+
+Note: a fixed-time maintenance contract contributes to the vehicle's `fixed_cost_share` per WO, **not** to [[Cost Per Km]]. Per-km maintenance economics come from `variable_usage` repair events (below).
 
 ### Repairs / Ad-hoc Maintenance → Cost Events
 
 When a vehicle gets repaired or has unscheduled work:
 
-- Creates a [[Cost Event]] with `cost_type = "repair"` or `"maintenance"`
-- These events feed into the [[Cost Per Km]] rate calculation
+- Creates a [[Cost Event]] with `cost_type=repair`, `cost_classification=variable_usage`
+- These events feed the `maintenance` bucket of [[Cost Per Km]] per [[ADR-016 — Cost Per Km Buckets]]
 
-### Tire Replacements → Cost Events (+ optional depreciation rule)
+If a repair is incurred specifically for one trip (e.g., a tire blow-out on WO-77 paid out-of-pocket on the road), it can be classified as `one_off` with `work_order_id` set — see [[ADR-015 — Per-WO Cost Events]].
 
-Tires are interesting — they're a significant cost that wears down with usage:
+### Tire Replacements → Cost Events
 
-- Record the purchase as a [[Cost Event]]
-- Optionally create a depreciation [[Cost Rule]] similar to [[ADR-004 — Vehicle Purchase Depreciation Spread]] but with expected tire life in km rather than time
-- See [[Vehicle Maintenance — Overview]] for tire tracking details
+Tires wear with usage. The `tire` bucket of [[Cost Per Km]] smooths replacement events into a stable per-km figure:
+
+- Record purchase as a [[Cost Event]] with `cost_type=tire_replacement`, `cost_classification=variable_usage`
+- The `tire` bucket has a longer default lookback (12 months) than `maintenance` (6 months) per [[ADR-016 — Cost Per Km Buckets]]
+
+A separate per-tire depreciation rule with `usage_prorate` strategy is **not** part of the current design — the bucket smoothing in Cost Per Km already produces a stable per-km tire rate without additional plumbing.
 
 ## What the Maintenance Module Must Provide
 
@@ -40,5 +45,10 @@ Tires are interesting — they're a significant cost that wears down with usage:
 
 - [[Vehicle Maintenance — Overview]]
 - [[Cost Ledger — Overview]]
+- [[Cost Rule]]
+- [[Cost Event]]
 - [[Cost Per Km]]
-- [[Integration — Cost Ledger × Delivery Costing]]
+- [[Integration — Order × Cost Ledger]]
+- [[ADR-014 — Cost Classification]]
+- [[ADR-015 — Per-WO Cost Events]]
+- [[ADR-016 — Cost Per Km Buckets]]
